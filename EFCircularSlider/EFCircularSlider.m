@@ -132,6 +132,10 @@ static const CGFloat kFitFrameRadius = -1.0;
 
 -(void)setInnerMarkingLabels:(NSArray*)innerMarkingLabels
 {
+    if (self.handlerBlock) {
+        self.handlerBlock(-1);
+    }
+    
     _innerMarkingLabels = innerMarkingLabels;
     [self setNeedsUpdateConstraints]; // This could affect intrinsic content size
     [self setNeedsDisplay]; // Need to redraw with new label texts
@@ -517,20 +521,21 @@ static const CGFloat kFitFrameRadius = -1.0;
 
 #pragma mark - UIControl functions
 
-- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
-    [super beginTrackingWithTouch:touch withEvent:event];
-    
-    if(self.snapToLabels && self.innerMarkingLabels != nil) {
-        CGPoint bestGuessPoint = [touch locationInView:self];
-        self.angleFromNorth = floor([EFCircularTrig angleRelativeToNorthFromPoint:self.centerPoint
-                                                                          toPoint:bestGuessPoint]);
-//        NSLog(@"beginTracking bestGuessPoint.x:%f, bestGuessPoint.y:%f", bestGuessPoint.x, bestGuessPoint.y);
-        //防止闪动
-//        [self setNeedsDisplay];
-    }
-    
-    return YES;
-}
+//处理点击事件
+//- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
+//    [super beginTrackingWithTouch:touch withEvent:event];
+//    
+//    if(self.snapToLabels && self.innerMarkingLabels != nil) {
+//        CGPoint bestGuessPoint = [touch locationInView:self];
+//        self.angleFromNorth = floor([EFCircularTrig angleRelativeToNorthFromPoint:self.centerPoint
+//                                                                          toPoint:bestGuessPoint]);
+////        NSLog(@"beginTracking bestGuessPoint.x:%f, bestGuessPoint.y:%f", bestGuessPoint.x, bestGuessPoint.y);
+//        //防止闪动
+////        [self setNeedsDisplay];
+//    }
+//    
+//    return YES;
+//}
 
 -(BOOL) continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
