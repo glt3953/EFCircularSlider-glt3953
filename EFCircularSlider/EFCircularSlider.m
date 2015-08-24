@@ -26,6 +26,8 @@
 @property (nonatomic, readonly) CGFloat radiusForDoubleCircleInnerCircle;
 @property (nonatomic, readonly) CGFloat lineWidthForDoubleCircleInnerCircle;
 
+@property (strong, nonatomic) void (^handlerBlock)(NSInteger index);
+
 @end
 
 static const CGFloat kFitFrameRadius = -1.0;
@@ -76,6 +78,10 @@ static const CGFloat kFitFrameRadius = -1.0;
     _angleFromNorth = 0;
     
     self.backgroundColor = [UIColor clearColor];
+}
+
+- (void)setSelectHandler:(void(^)(NSInteger index))handler {
+    self.handlerBlock = handler;
 }
 
 #pragma mark - Public setter overrides
@@ -505,6 +511,7 @@ static const CGFloat kFitFrameRadius = -1.0;
     CGPoint inwardOffset   = [EFCircularTrig pointOnRadius:radialDistance
                                             atAngleFromNorth:degreesFromNorthForLabel];
     
+//    NSLog(@"index:%ld, -labelSize.width * 0.5:%f, inwardOffset.x:%f, -labelSize.height * 0.5:%f, inwardOffset.y:%f", index, -labelSize.width * 0.5, inwardOffset.x, -labelSize.height * 0.5, inwardOffset.y);
     return CGPointMake(-labelSize.width * 0.5 + inwardOffset.x, -labelSize.height * 0.5 + inwardOffset.y);
 }
 
@@ -546,6 +553,8 @@ static const CGFloat kFitFrameRadius = -1.0;
         float minDist = 360;
         NSUInteger labelsCount = self.innerMarkingLabels.count;
         
+        NSInteger selectedIndex = 0;
+        
         for (int i = 0; i < labelsCount; i++)
         {
             CGFloat percentageAlongCircle = i/(float)labelsCount;
@@ -554,8 +563,14 @@ static const CGFloat kFitFrameRadius = -1.0;
             {
                 minDist = fabs(self.angleFromNorth - degreesForLabel);
                 bestGuessPoint = [self pointOnCircleAtAngleFromNorth:degreesForLabel];
+                selectedIndex = i;
             }
         }
+        
+        if (self.handlerBlock) {
+            self.handlerBlock(selectedIndex - 1);
+        }
+        
         self.angleFromNorth = floor([EFCircularTrig angleRelativeToNorthFromPoint:self.centerPoint
                                                                              toPoint:bestGuessPoint]);
 //        NSLog(@"endTracking bestGuessPoint.x:%f, bestGuessPoint.y:%f", bestGuessPoint.x, bestGuessPoint.y);

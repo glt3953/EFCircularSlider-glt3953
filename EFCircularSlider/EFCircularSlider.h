@@ -101,4 +101,7 @@ typedef enum : NSUInteger {
  */
 @property (nonatomic) CircularSliderHandleType handleType;
 
+//实时推送当前选择项
+- (void)setSelectHandler:(void(^)(NSInteger index))handler;
+
 @end
