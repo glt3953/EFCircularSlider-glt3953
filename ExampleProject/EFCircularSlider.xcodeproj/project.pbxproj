@@ -269,11 +269,11 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = EF;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = "Eliot Fowler";
 				TargetAttributes = {
 					73AA2225184F85BF0019641B = {
-						DevelopmentTeam = 99RZ6CD595;
+						DevelopmentTeam = L2B92D42L7;
 					};
 					73AA2246184F85BF0019641B = {
 						TestTargetID = 73AA2225184F85BF0019641B;
@@ -394,7 +394,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -433,7 +432,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -493,7 +491,6 @@
 		73AA225C184F85BF0019641B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/EFCircularSlider.app/EFCircularSlider";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -516,7 +513,6 @@
 		73AA225D184F85BF0019641B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/EFCircularSlider.app/EFCircularSlider";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",

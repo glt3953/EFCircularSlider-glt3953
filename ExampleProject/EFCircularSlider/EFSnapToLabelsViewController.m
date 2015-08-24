@@ -28,7 +28,7 @@
 {
     [super viewDidLoad];
 	
-    CGRect sliderFrame = CGRectMake(60, 150, 200, 200);
+    CGRect sliderFrame = CGRectMake(60, 50, 200, 200);
     EFCircularSlider* circularSlider = [[EFCircularSlider alloc] initWithFrame:sliderFrame];
     
     NSArray* labels = @[@"B", @"C", @"D", @"E", @"A"];
@@ -36,6 +36,23 @@
     circularSlider.snapToLabels = YES;
     
     [self.view addSubview:circularSlider];
+    
+    sliderFrame = CGRectMake(60, 300, 200, 200);
+    EFCircularSlider *orientationSelectCircularSlider = [[EFCircularSlider alloc] initWithFrame:sliderFrame];
+    [orientationSelectCircularSlider setFilledColor:[UIColor lightGrayColor]];
+    [orientationSelectCircularSlider setUnfilledColor:[UIColor lightGrayColor]];
+    
+    [orientationSelectCircularSlider setHandleColor:[UIColor whiteColor]];
+    
+    orientationSelectCircularSlider.lineWidth = 30;
+    orientationSelectCircularSlider.labelFont = [UIFont systemFontOfSize:16];
+    orientationSelectCircularSlider.labelColor = [UIColor darkGrayColor];
+    
+    labels = @[@"东北", @"东", @"东南", @"南", @"西南", @"西", @"西北", @"北"];
+//    labels = @[@"", @"", @"", @"", @"", @"", @"", @""];
+    [orientationSelectCircularSlider setInnerMarkingLabels:labels];
+    orientationSelectCircularSlider.snapToLabels = YES;
+    [self.view addSubview:orientationSelectCircularSlider];
 }
 
 - (void)didReceiveMemoryWarning

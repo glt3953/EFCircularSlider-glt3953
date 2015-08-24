@@ -201,29 +201,35 @@ static const CGFloat kFitFrameRadius = -1.0;
 -(UIColor*)handleColor
 {
     UIColor *newHandleColor = _handleColor;
-    switch (self.handleType) {
-        case CircularSliderHandleTypeSemiTransparentWhiteCircle:
-        {
-            newHandleColor = [UIColor colorWithWhite:1.0 alpha:0.7];
-            break;
-        }
-        case CircularSliderHandleTypeSemiTransparentBlackCircle:
-        {
-            newHandleColor = [UIColor colorWithWhite:0.0 alpha:0.7];
-            break;
-        }
-        case CircularSliderHandleTypeDoubleCircleWithClosedCenter:
-        case CircularSliderHandleTypeDoubleCircleWithOpenCenter:
-        case CircularSliderHandleTypeBigCircle:
-        {
-            if (!newHandleColor)
-            {
-                // handleColor public property hasn't been set - use filledColor
-                newHandleColor = self.filledColor;
-            }
-            break;
-        }
+    if (!newHandleColor)
+    {
+        // handleColor public property hasn't been set - use filledColor
+        newHandleColor = self.filledColor;
     }
+    
+//    switch (self.handleType) {
+//        case CircularSliderHandleTypeSemiTransparentWhiteCircle:
+//        {
+//            newHandleColor = [UIColor colorWithWhite:1.0 alpha:0.7];
+//            break;
+//        }
+//        case CircularSliderHandleTypeSemiTransparentBlackCircle:
+//        {
+//            newHandleColor = [UIColor colorWithWhite:0.0 alpha:0.7];
+//            break;
+//        }
+//        case CircularSliderHandleTypeDoubleCircleWithClosedCenter:
+//        case CircularSliderHandleTypeDoubleCircleWithOpenCenter:
+//        case CircularSliderHandleTypeBigCircle:
+//        {
+//            if (!newHandleColor)
+//            {
+//                // handleColor public property hasn't been set - use filledColor
+//                newHandleColor = self.filledColor;
+//            }
+//            break;
+//        }
+//    }
     
     return newHandleColor;
 }
@@ -504,20 +510,36 @@ static const CGFloat kFitFrameRadius = -1.0;
 
 #pragma mark - UIControl functions
 
+- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
+    [super beginTrackingWithTouch:touch withEvent:event];
+    
+    if(self.snapToLabels && self.innerMarkingLabels != nil) {
+        CGPoint bestGuessPoint = [touch locationInView:self];
+        self.angleFromNorth = floor([EFCircularTrig angleRelativeToNorthFromPoint:self.centerPoint
+                                                                          toPoint:bestGuessPoint]);
+//        NSLog(@"beginTracking bestGuessPoint.x:%f, bestGuessPoint.y:%f", bestGuessPoint.x, bestGuessPoint.y);
+        //防止闪动
+//        [self setNeedsDisplay];
+    }
+    
+    return YES;
+}
+
 -(BOOL) continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
     [super continueTrackingWithTouch:touch withEvent:event];
     
     CGPoint lastPoint = [touch locationInView:self];
+//    NSLog(@"continueTracking lastPoint:%f, lastPoint:%f", lastPoint.x, lastPoint.y);
     [self moveHandle:lastPoint];
     [self sendActionsForControlEvents:UIControlEventValueChanged];
     
     return YES;
 }
 
--(void)endTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
-{
+-(void)endTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
     [super endTrackingWithTouch:touch withEvent:event];
+    
     if(self.snapToLabels && self.innerMarkingLabels != nil)
     {
         CGPoint bestGuessPoint = CGPointZero;
@@ -528,14 +550,16 @@ static const CGFloat kFitFrameRadius = -1.0;
         {
             CGFloat percentageAlongCircle = i/(float)labelsCount;
             CGFloat degreesForLabel       = percentageAlongCircle * 360;
-            if(abs(self.angleFromNorth - degreesForLabel) < minDist)
+            if(fabs(self.angleFromNorth - degreesForLabel) < minDist)
             {
-                minDist = abs(self.angleFromNorth - degreesForLabel);
+                minDist = fabs(self.angleFromNorth - degreesForLabel);
                 bestGuessPoint = [self pointOnCircleAtAngleFromNorth:degreesForLabel];
             }
         }
         self.angleFromNorth = floor([EFCircularTrig angleRelativeToNorthFromPoint:self.centerPoint
                                                                              toPoint:bestGuessPoint]);
+//        NSLog(@"endTracking bestGuessPoint.x:%f, bestGuessPoint.y:%f", bestGuessPoint.x, bestGuessPoint.y);
+        
         [self setNeedsDisplay];
     }
 }
