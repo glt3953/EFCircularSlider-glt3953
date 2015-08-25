@@ -28,6 +28,8 @@
 
 @property (strong, nonatomic) void (^handlerBlock)(NSInteger index);
 
+@property (strong, nonatomic) UIView *sliderView;
+
 @end
 
 static const CGFloat kFitFrameRadius = -1.0;
@@ -78,6 +80,80 @@ static const CGFloat kFitFrameRadius = -1.0;
     _angleFromNorth = 0;
     
     self.backgroundColor = [UIColor clearColor];
+    
+    self.sliderView = [[UIView alloc] init];
+    [self addSubview:self.sliderView];
+    //添加阴影效果
+    self.sliderView.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.sliderView.layer.shadowOffset = CGSizeMake(0, 0);//shadowOffset阴影偏移,x向右偏移4，y向下偏移4，默认(0, -3)
+    self.sliderView.layer.shadowOpacity = 0.5;//阴影透明度，默认0
+    UIPanGestureRecognizer *sliderRec = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(sliderMoved:)];
+    [self.sliderView addGestureRecognizer:sliderRec];
+}
+
+- (CGFloat)sliderWidth{
+    return _lineWidth;
+}
+
+- (void)layoutSubviews {
+    self.sliderView.backgroundColor = _handleColor;
+    self.sliderView.layer.cornerRadius = [self sliderWidth] / 2;
+    self.sliderView.layer.shadowRadius = 5; //阴影半径
+    
+    CGPoint bestGuessPoint = CGPointZero;
+    float minDist = 360;
+    NSUInteger labelsCount = self.innerMarkingLabels.count;
+    
+    int i = 0;
+    CGFloat percentageAlongCircle = i/(float)labelsCount;
+    CGFloat degreesForLabel       = percentageAlongCircle * 360;
+    if(fabs(self.angleFromNorth - degreesForLabel) < minDist) {
+        minDist = fabs(self.angleFromNorth - degreesForLabel);
+        bestGuessPoint = [self pointOnCircleAtAngleFromNorth:degreesForLabel];
+    }
+
+    self.sliderView.frame = (CGRect){0, 0, [self sliderWidth], [self sliderWidth]};
+    self.sliderView.center = bestGuessPoint;
+}
+
+- (void)sliderMoved:(UIPanGestureRecognizer *)rec {
+    if (rec.state == UIGestureRecognizerStateChanged) {
+        CGPoint point = [rec locationInView:self];
+        self.angleFromNorth = floor([EFCircularTrig angleRelativeToNorthFromPoint:self.centerPoint
+                                                                          toPoint:point]);
+        if (self.handlerBlock) {
+            self.handlerBlock(self.angleFromNorth * self.innerMarkingLabels.count / 360 - 1);
+        }
+        CGPoint bestGuessPoint = [self pointOnCircleAtAngleFromNorth:self.angleFromNorth];
+        rec.view.center = bestGuessPoint;
+    } else if (rec.state == UIGestureRecognizerStateEnded || rec.state == UIGestureRecognizerStateCancelled || rec.state == UIGestureRecognizerStateFailed) {
+        if(self.snapToLabels && self.innerMarkingLabels != nil)
+        {
+            CGPoint bestGuessPoint = CGPointZero;
+            float minDist = 360;
+            NSUInteger labelsCount = self.innerMarkingLabels.count;
+            
+            NSInteger selectedIndex = 0;
+            
+            for (int i = 0; i < labelsCount; i++)
+            {
+                CGFloat percentageAlongCircle = i/(float)labelsCount;
+                CGFloat degreesForLabel       = percentageAlongCircle * 360;
+                if(fabs(self.angleFromNorth - degreesForLabel) < minDist)
+                {
+                    minDist = fabs(self.angleFromNorth - degreesForLabel);
+                    bestGuessPoint = [self pointOnCircleAtAngleFromNorth:degreesForLabel];
+                    selectedIndex = i;
+                }
+            }
+            
+            if (self.handlerBlock) {
+                self.handlerBlock(selectedIndex - 1);
+            }
+            
+            self.sliderView.center = bestGuessPoint;
+        }
+    }
 }
 
 - (void)setSelectHandler:(void(^)(NSInteger index))handler {
@@ -320,8 +396,8 @@ static const CGFloat kFitFrameRadius = -1.0;
     // Draw the circular lines that slider handle moves along
     [self drawLine:ctx];
     
-    // Draw the draggable 'handle'
-    [self drawHandle:ctx];
+    // Draw the draggable 'handle',画圆
+//    [self drawHandle:ctx];
     
     // Add the labels
     [self drawInnerLabels:ctx];
@@ -606,6 +682,7 @@ static const CGFloat kFitFrameRadius = -1.0;
 -(CGPoint)pointOnCircleAtAngleFromNorth:(int)angleFromNorth
 {
     CGPoint offset = [EFCircularTrig  pointOnRadius:self.radius atAngleFromNorth:angleFromNorth];
+//    NSLog(@"angleFromNorth:%d, offset.x:%f, offset.y:%f", angleFromNorth, offset.x, offset.y);
     return CGPointMake(self.centerPoint.x + offset.x, self.centerPoint.y + offset.y);
 }
 
